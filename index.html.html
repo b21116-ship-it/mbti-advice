@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오직 당신만을 위한 mbti 고민상담</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --bg-color: #f5f6fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            max-width: 500px;
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 30px 24px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* ── [중요] 단계별 화면 제어 클래스 ── */
+        .step-panel {
+            display: none; /* 기본적으로 모든 화면을 숨김 */
+        }
+
+        /* active 클래스가 붙은 화면만 브라우저에 표시됩니다. */
+        .step-panel.active {
+            display: block !important; 
+            animation: fadeInMove 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeInMove {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 1단계 입력창 영역 */
+        .input-group {
+            margin: 30px 0;
+            background: #f8f9fa;
+            padding: 25px 15px;
+            border-radius: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #4a4a4a;
+        }
+
+        .mbti-input-wrapper {
+            max-width: 180px;
+            margin: 0 auto 20px auto;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2.5px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 24px;
+            box-sizing: border-box;
+            text-transform: uppercase;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: 5px;
+            outline: none;
+            transition: all 0.25s ease;
+            background-color: #ffffff;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(108, 92, 231, 0.2);
+        }
+
+        /* 공통 버튼 디자인 */
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
+        }
+
+        .action-btn:hover {
+            background-color: #5b4cc4;
+            transform: translateY(-1px);
+        }
+
+        /* 2단계 결과 상자 */
+        .analysis-card {
+            background: #faf9ff;
+            border: 1.5px solid #e8e5ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .analysis-item {
+            margin-bottom: 12px;
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+        .analysis-item b {
+            color: var(--primary-color);
+        }
+
+        /* 3단계 고민 카테고리 그리드 */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .category-btn {
+            background-color: #ffffff;
+            border: 1.5px solid #edf2f7;
+            padding: 14px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #4a5568;
+        }
+
+        .category-btn:hover {
+            border-color: var(--secondary-color);
+            background-color: #faf9ff;
+            color: var(--primary-color);
+        }
+
+        .category-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+        }
+
+        /* 최종 조언 출력 박스 */
+        .result-box {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #e2e8f0;
+            display: none;
+            text-align: left;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #faf9ff;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .result-emoji { font-size: 24px; }
+        .result-title { font-size: 16px; font-weight: 800; }
+
+        .advice-list { display: flex; flex-direction: column; gap: 10px; }
+        .advice-card {
+            background: #ffffff;
+            border: 1.5px solid #f0f0f0;
+            padding: 14px;
+            border-radius: 12px;
+        }
+
+        .indicator-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .badge-ei { background: #ffeaa7; color: #d63031; }
+        .badge-sn { background: #81ecec; color: #00b894; }
+        .badge-tf { background: #74b9ff; color: #0984e3; }
+        .badge-jp { background: #a29bfe; color: #6c5ce7; }
+
+        .advice-text { font-size: 14px; line-height: 1.5; color: #2d3436; margin: 0; word-break: keep-all; }
+        
+        .back-link {
+            background: none;
+            border: none;
+            color: #95a5a6;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 15px;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>오직 당신만을 위한 mbti 고민상담</h1>
+    <div class="tagline">"당신의 mbti에 딱 맞는 조언, 들어보시겠어요?"</div>
+
+    <div id="panelStep1" class="step-panel active">
+        <div class="input-group">
+            <label for="mbtiInput">나의 MBTI 4자리를 입력해 주세요</label>
+            <div class="mbti-input-wrapper">
+                <input type="text" id="mbtiInput" placeholder="INFP" maxlength="4" autocomplete="off">
+            </div>
+            <button class="action-btn" onclick="goToStep2()">나의 성격 분석하기 🔮</button>
+        </div>
+    </div>
+
+    <div id="panelStep2" class="step-panel">
+        <h3 id="analysisHeader" style="margin: 0 0 10px 0; font-size: 18px; color: var(--primary-color);"></h3>
+        <div class="analysis-card" id="analysisContent">
+            </div>
+        <button class="action-btn" onclick="goToStep3()">맞춤형 조언 선택하러 가기 ➔</button>
+        <button class="back-link" onclick="backToStep1()">◀ MBTI 다시 입력하기</button>
+    </div>
+
+    <div id="panelStep3" class="step-panel">
+        <div style="text-align: left; font-size: 14px; font-weight: 700; color: #4a4a4a; margin-bottom: 10px; border-left: 3px solid var(--primary-color); padding-left: 6px;">
+            해결하고 싶은 고민 카테고리를 선택해 주세요
+        </div>
+        <div class="category-grid">
+            <button class="category-btn" onclick="showFinalAdvice('연애', this)">❤️ 연애</button>
+            <button class="category-btn" onclick="showFinalAdvice('공부', this)">✍️ 공부</button>
+            <button class="category-btn" onclick="showFinalAdvice('가족', this)">🏡 가족</button>
+            <button class="category-btn" onclick="showFinalAdvice('나 자신', this)">👤 나 자신</button>
+            <button class="category-btn" onclick="showFinalAdvice('옷 스타일', this)">👗 옷 스타일</button>
+            <button class="category-btn" onclick="showFinalAdvice('어울리는 색깔', this)">🎨 어울리는 색깔</button>
+            <button class="category-btn" onclick="showFinalAdvice('나만의 분위기', this)">✨ 나만의 분위기</button>
+            <button class="category-btn" onclick="showFinalAdvice('취미 추천', this)">🏄‍♂️ 취미 추천</button>
+            <button class="category-btn" onclick="showFinalAdvice('친구 궁합', this)">🤝 친구 궁합</button>
+            <button class="category-btn" onclick="showFinalAdvice('삶이 힘들 때', this)">🔋 삶이 힘들 때</button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <div class="result-header">
+                <div class="result-emoji" id="resultEmoji">🔮</div>
+                <div class="result-title" id="resultTitle">맞춤 종합 조언</div>
+            </div>
+            <div class="advice-list" id="adviceList">
+                </div>
+        </div>
+        
+        <button class="back-link" onclick="backToStep2()">◀ 이전 성격 분석으로</button>
+    </div>
+</div>
+
+<script>
+    // 전역으로 관리할 사용자의 MBTI 변수
+    let userMBTI = "";
+
+    // 2단계용: 핵심 지표별 성격 특징 데이터
+    const traitDatabase = {
+        "E": "<b>외향 (E):</b> 에너지를 주로 외부 사람들과 활동에서 얻으며 활발한 소통을 즐깁니다.",
+        "I": "<b>내향 (I):</b> 에너지를 내면 세계와 나만의 조용한 시간 속에서 깊이 있게 충전합니다.",
+        "S": "<b>감각 (S):</b> 현실적인 경험과 실제 존재하는 구체적인 사실을 신뢰하는 실용적인 성향입니다.",
+        "N": "<b>직관 (N):</b> 아이디어가 풍부하며 현재의 사실 너머 숨겨진 미래의 가능성을 탐구합니다.",
+        "T": "<b>사고 (T):</b> 원인과 결과를 중시하며, 문제를 해결할 때 객관적이고 논리적인 인과관계를 따집니다.",
+        "F": "<b>감정 (F):</b> 사람 간의 관계와 조화를 소중히 여기며 타인의 상황에 깊이 공감해 줍니다.",
+        "J": "<b>판단 (J):</b> 계획적이고 체계적인 환경을 선호하며 뚜렷한 목표를 향해 순서대로 실행합니다.",
+        "P": "<b>인식 (P):</b> 상황 변화에 유연하고 즉흥적으로 대처하는 것을 좋아하며 자유로운 변화를 즐깁니다."
+    };
+
+    // 3단계용: 10대 카테고리별 지표 조언 매트릭스
+    const adviceDatabase = {
+        "연애": {
+            "E": "적극적으로 마음을 표현하고 직진하는 타입이군요! 다만 상대방이 내성적이라면 속도를 조금 맞춰주는 배려도 필요해요.",
+            "I": "신중하고 진중하게 상대방을 챙겨주는 따뜻한 사람이네요. 가끔은 표현하지 않으면 모르니 용기 내어 말해 보세요.",
+            "S": "연인의 기념일이나 사소한 취향을 잘 기억하고 현실적인 도움을 주는 든든한 동반자입니다.",
+            "N": "함께 미래를 꿈꾸고 깊은 대화를 나누는 로맨틱한 연애를 추구하는군요! 낭만적인 이벤트를 좋아합니다.",
+            "T": "연인의 문제를 이성적으로 해결해 주려 노력하지만, 때로는 정답보다 \"속상했겠다\"라는 공감이 더 필요할 수 있어요.",
+            "F": "연인의 감정에 깊이 공감하고 맞춰주는 다정한 사람이에요. 상처받지 않도록 서운한 점은 바로 말하는 게 좋아요.",
+            "J": "데이트 코스와 맛집을 미리 완벽하게 계획하는 편이군요! 가끔은 계획대로 안 되어도 그 상황을 즐겨보세요.",
+            "P": "즉흥적이고 자유로운 데이트를 선호하며, 그날의 기분에 따라 재미있는 추억을 만들어가는 대장정 스타일입니다."
+        },
+        "공부": {
+            "E": "혼자 공부하면 지치기 쉬우니 친구들과 질문을 주고받거나 스터디 그룹을 활용해 에너지를 채우며 공부하세요.",
+            "I": "소음이 차단된 조용하고 독립된 나만의 공간(독서실, 방 안)에서 집중할 때 최고의 효율이 나옵니다.",
+            "S": "개념부터 문제풀이까지 차근차근 순서대로 밟아가는 정석적인 공부법이 가장 잘 맞습니다.",
+            "N": "전체적인 맥락과 원리를 먼저 이해해야 진도가 나가는 타입이네요. 마인드맵을 그리며 공부해 보세요.",
+            "T": "오답 노트를 만들고 원인을 논리적으로 분석할 때 실력이 눈에 띄게 향상되는 스마트한 학습자입니다.",
+            "F": "칭찬을 받거나 좋아하는 선생님의 과목일 때 학습 의욕이 마구 샘솟는 감성적인 스타일입니다.",
+            "J": "주간/일일 계획표를 정교하게 짜고 이를 하나씩 지워나갈 때 가장 큰 성취감과 집중력을 얻습니다.",
+            "P": "벼락치기에 강하고 순간 몰입도가 대단해요! 긴 계획보다는 '오늘 밤 안으로 끝내기' 같은 단기 목표가 유리합니다."
+        },
+        "가족": {
+            "E": "집에서도 조잘조잘 오늘 있었던 일들을 공유하며 가족 분위기를 밝게 만드는 인간 비타민입니다.",
+            "I": "밖에서 에너지를 많이 쓰고 온 날에는 가족들과 있더라도 혼자 방에서 쉴 수 있는 충전 시간이 꼭 필요합니다.",
+            "S": "가족들의 생일, 가전제품 교체 등 집안의 대소사와 현실적인 필요를 꼼꼼하게 잘 챙기는 편입니다.",
+            "N": "가족들과 삶의 가치관이나 미래에 대한 깊은 대화를 나누며 정서적 유대감을 느끼고 싶어 합니다.",
+            "T": "가족 내에서 갈등이 생기면 감정에 치우치기보다 시시비비를 명확히 가려 해결하려는 이성파입니다.",
+            "F": "가족들의 눈빛이나 말투만 봐도 기분을 알아채고, 따뜻한 위로와 리액션으로 가족을 안아주는 다정둥이입니다.",
+            "J": "집안 물건의 위치나 가족 공동의 규칙, 행사 일정이 계획대로 딱딱 맞아떨어지는 것을 좋아합니다.",
+            "P": "집에서만큼은 어떠한 규칙이나 구속 없이 유연하고 편안하게 늘어져서 쉬는 것을 선호합니다."
+        },
+        "나 자신": {
+            "E": "스스로가 작아 보일 때는 집에만 있지 말고, 친한 사람들을 만나 대화하며 긍정적인 에너지를 받아오세요.",
+            "I": "지칠 때는 인간관계를 잠시 쉬고, 온전히 나 혼자만의 공간에서 좋아하는 것을 하며 내면을 돌봐주어야 합니다.",
+            "S": "생각에 갇히기보다 현재 내 눈앞에 있는 방 청소, 맛있는 음식 먹기 등 감각적인 활동으로 기분을 전환하세요.",
+            "N": "내 삶의 의미และ 미래의 자아상에 대해 끊임없이 고민하며 성장해 나가는 깊은 내면을 가진 사람입니다.",
+            "T": "힘든 일이 생기면 '왜 이런 일이 생겼지?' 분석하기 바쁘지만, 가끔은 내 마음의 상처를 먼저 인정해 주세요.",
+            "F": "남들의 시선이나 말 한마디에 내 가치를 의심하지 마세요. 당신은 존재 자체로 소중하고 아름다운 사람입니다.",
+            "J": "무기력할 때는 일상 루틴이 깨져서 그럴 수 있으니, 아주 가벼운 내일의 할 일 목록부터 다시 작성해 보세요.",
+            "P": "스스로를 너무 틀에 가두려 하지 마세요. 조금 방황하고 계획대로 안 되어도 당신은 결국 길을 찾아낼 것입니다."
+        },
+        "옷 스타일": {
+            "E": "톡톡 튀는 컬러나 트렌디한 아이템을 매치해 시선을 끄는 화사한 스타일이 에너지를 더해줍니다.",
+            "I": "무채색 계열이나 차분한 톤을 기본으로 한 단정하고 깔끔한 룩이 편안함을 줍니다.",
+            "S": "활동하기 편하고 오래 입어도 질리지 않는 실용적인 '캐주얼룩'이나 '미니멀룩'이 찰떡입니다.",
+            "N": "남들과 똑같은 옷은 심심하죠! 독특한 레이어드나 나만의 빈티지 소품을 활용한 '유니크룩'을 추천해요.",
+            "T": "핏이 딱 떨어지고 지적인 느낌을 주는 자켓, 셔츠 기반의 '시크룩'이나 '슬랙스 코디'가 잘 어울립니다.",
+            "F": "부드럽고 따뜻한 인상을 주는 니트, 셔링, 혹은 파스텔 톤의 원피스 같은 '모던 캐주얼/러블리룩'이 어울려요.",
+            "J": "TPO(시간, 장소, 상황)에 완벽하게 부합하며, 가방부터 신발까지 정돈된 느낌의 칼정장/칼세팅 스타일을 선호합니다.",
+            "P": "꾸민 듯 안 꾸민 듯 자연스러운 '꾸안꾸 스타일'이나 오버핏의 편안하고 힙한 '스트릿 패션'이 제격입니다."
+        },
+        "어울리는 색깔": {
+            "E": "당신의 열정을 닮은 '선명한 레드'나 밝은 에너지를 발산하는 '네온 옐로우'가 주변을 밝힙니다.",
+            "I": "마음을 차분하게 진정시켜 주는 '딥 블루'나 자연을 닮은 '클래식 카키'가 편안한 안식을 줍니다.",
+            "S": "유행을 타지 않고 언제나 안정감을 주는 '초콜릿 브라운'이나 '차콜 그레이'가 신뢰감을 더합니다.",
+            "N": "상상력을 자극하고 신비로운 아우라를 풍기는 '미드나잇 퍼플'이나 '오로라 실버'가 어울립니다.",
+            "T": "이성적이고 스마트한 당신의 지성을 돋보이게 할 '클래식 네이비'와 '스틸 화이트'를 추천합니다.",
+            "F": "따스함과 포근함으로 주변을 치유하는 당신에게는 '파스텔 핑크'나 '크림 베이지'가 행운의 컬러입니다.",
+            "J": "흐트러짐 없이 똑 부러지는 성향에 걸맞은 강렬하고 선명한 '모노톤 블랙앤화이트'가 어울립니다.",
+            "P": "자유롭고 구속 없는 영혼을 대변하는 파도 같은 '아쿠아 민트'나 '라임 그린'이 활력을 줍니다."
+        },
+        "나만의 분위기": {
+            "E": "처음 본 사람도 무장해제 시키는 '비타민' 같고 활기찬 에너지가 방 안을 가득 채웁니다.",
+            "I": "말을 많이 하지 않아도 은은한 깊이가 느껴지는 '단단하고 고요한 숲' 같은 아우라를 풍깁니다.",
+            "S": "현실적이고 야무진 면모 덕분에 주변 사람들에게 \"참 믿음직하고 단단한 사람이다\"라는 인상을 줍니다.",
+            "N": "어딘가 모르게 신비롭고 생각이 깊어 보여서, 알면 알수록 호기심을 자극하는 매력이 있습니다.",
+            "T": "일 처리나 대화에서 지적이고 쿨한 매력이 돋보여 도시적이고 스마트한 세련미가 느껴집니다.",
+            "F": "눈빛과 표정에 다정함이 묻어 있어, 누구든 곁에 있으면 마음이 사르르 녹아내리는 포근한 무드가 있습니다.",
+            "J": "단정하게 정돈된 태도와 신뢰감을 주는 행동 덕분에 성숙하고 어른스러운 아우라가 뿜어져 나옵니다.",
+            "P": "얽매이지 않는 자유로움과 유연한 태도 덕분에 트렌디하고 힙하며 다가가기 편한 동네 친구 분위기가 있습니다."
+        },
+        "취미 추천": {
+            "E": "크루 러닝, 댄스 학원, 파티 룸 모임 등 사람들과 왁자지껄 섞여서 땀 흘리는 액티비티가 좋습니다.",
+            "I": "혼자만의 공간에서 즐기는 다이어리 꾸미기(다꾸), 나만의 베이킹, 방구석 영화 정주행을 추천합니다.",
+            "S": "손으로 직접 만지고 결과물이 나오는 가죽 공예, 도자기 만들기, 가드닝(식물 키우기)이 제격입니다.",
+            "N": "상상력을 자극하는 추리 소설 읽기, 보드게임, 혹은 새로운 세상을 그리는 그림 그리기가 흥미로울 거예요.",
+            "T": "체계적인 규칙이 있고 두뇌를 써서 승리하는 체스, 코딩 토이 프로젝트, 주식/재테크 공부가 재밌습니다.",
+            "F": "마음을 몽글몽글하게 채워주는 감성 사진 찍기, 유기동물 봉사활동, 악기 연주(피아노, 기타)를 즐겨보세요.",
+            "J": "헬스 피티(PT)처럼 일정이 딱 정해진 운동이나, 단계를 밟아 마스터하는 자격증 공부형 취미가 잘 맞습니다.",
+            "P": "정해진 룰 없이 내 마음대로 발길 닿는 대로 떠나는 당일치기 즉흥 여행이나, 전시회 관람이 좋습니다."
+        },
+        "친구 궁합": {
+            "E": "친구들 사이에서 단체 대화방을 활성화하고 약속을 주도하는 최고의 마당발 역할을 자처합니다.",
+            "I": "많은 친구보다 좁고 깊은 관계를 소중히 하며, 내 비밀을 믿고 털어놓을 수 있는 소울메이트를 원합니다.",
+            "S": "친구가 힘들 때 맛있는 밥을 사주거나 데리러 가는 등 실질적이고 의리 넘치는 행동으로 우정을 보여줍니다.",
+            "N": "밤새도록 인생, 우주, 가치관에 대해 뜬구름 잡는 이야기를 나누어도 밤새 통하는 소통 메이트를 좋아합니다.",
+            "T": "친구의 고민에 정확한 팩트와 현실적인 해결책을 제시해 주는 냉철하지만 든든한 조언자입니다.",
+            "F": "친구의 슬픔에 내 일처럼 같이 울어주고 리액션해 주는 우주 최강의 공감 요정입니다.",
+            "J": "친구들과 만날 때 시간 약속과 장소를 철저히 지키며, 모임의 총무나 총괄을 맡으면 완벽하게 해냅니다.",
+            "P": "친구가 갑자기 \"지금 나올래?\" 하고 부르는 번개 모임에 흔쾌히 응하는 세상에서 제일 편한 친구입니다."
+        },
+        "삶이 힘들 때": {
+            "E": "혼자 굴 파고 들어가지 마세요! 믿을 수 있는 친구를 만나 마음껏 수다를 떨며 털어내는 것이 회복의 지름길입니다.",
+            "I": "모든 연락을 잠시 무음으로 돌리고, 오직 나만의 방에서 좋아하는 이불을 덮고 푹 자는 정적 충전이 시급합니다.",
+            "S": "먼 미래 걱정은 스톱! 지금 당장 매운 음식을 먹거나 뜨거운 샤워를 하며 몸의 감각에 집중해 보세요.",
+            "N": "지금의 힘듦도 결국 나를 성장시킬 거라는 일기를 쓰거나, 좋아하는 명언/책을 읽으며 마인드를 다잡으세요.",
+            "T": "상황을 감정적으로 받아들이기보다, 나를 힘들게 하는 원인들을 종이에 객관적으로 적어보고 하나씩 제거해 가세요.",
+            "F": "자책하지 마세요. \"그동안 참 많이 힘들었겠구나\" 하고 내 마음을 스스로 알아주고 눈물이 난다면 펑펑 우는 것도 좋아요.",
+            "J": "번아웃이 왔다면 모든 계획을 중단하세요. '아무것도 안 하기'를 목표로 삼고 며칠 동안 시계 없이 살아보세요.",
+            "P": "무기력의 늪에 빠졌을 때는 '아침에 이불 개기', '물 한 잔 마시기' 같은 아주 사소한 규칙 하나로 일상을 깨워보세요."
+        }
+    };
+
+    const emojiMap = {
+        "연애": "❤️", "공부": "✍️", "가족": "🏡", "나 자신": "👤", "옷 스타일": "👗",
+        "어울리는 색깔": "🎨", "나만의 분위기": "✨", "취미 추천": "🏄‍♂️", "친구 궁합": "🤝", "삶이 힘들 때": "🔋"
+    };
+
+    // 화면 전환 제어 핵심 함수
+    function switchView(activePanelId) {
+        // 모든 패널을 숨김
+        document.querySelectorAll('.step-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        // 대상 패널만 활성화
+        document.getElementById(activePanelId).classList.add('active');
+    }
+
+    // [1단계 -> 2단계 이동 함수]
+    function goToStep2() {
+        const inputField = document.getElementById('mbtiInput');
+        const mbtiValue = inputField.value.trim().toUpperCase();
+        const validatePattern = /^[EI][SN][TF][JP]$/;
+
+        if (!mbtiValue) {
+            alert("나의 MBTI를 입력해 주세요!");
+            return;
+        }
+        if (!validatePattern.test(mbtiValue)) {
+            alert("올바른 MBTI 4자리를 입력해 주세요! (예: INFP, ESTJ)");
+            return;
+        }
+
+        // 입력받은 데이터를 전역 변수에 안전하게 바인딩
+        userMBTI = mbtiValue;
+
+        // 2단계 특징 텍스트 생성 및 삽입
+        document.getElementById('analysisHeader').innerText = `🔮 [${userMBTI}] 유형 종합 성격 분석`;
+        
+        const chars = userMBTI.split('');
+        let htmlSnippet = "";
+        chars.forEach(c => {
+            if (traitDatabase[c]) {
+                htmlSnippet += `<div class="analysis-item">${traitDatabase[c]}</div>`;
+            }
+        });
+        document.getElementById('analysisContent').innerHTML = htmlSnippet;
+
+        // 2단계 화면으로 전환
+        switchView('panelStep2');
+    }
+
+    // [2단계 -> 3단계 이동 함수]
+    function goToStep3() {
+        // 기존 선택 이력 및 결과창 숨김 초기화
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('resultBox').style.display = 'none';
+        
+        // 3단계 화면으로 전환
+        switchView('panelStep3');
+    }
+
+    // 뒤로 가기 링크 매핑 함수들
+    function backToStep1() { switchView('panelStep1'); }
+    function backToStep2() { switchView('panelStep2'); }
+
+    // [3단계: 카테고리 클릭 시 실시간 종합 조언 로드 함수]
+    function showFinalAdvice(category, element) {
+        // 버튼 선택 시각 효과 부여
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+
+        const chars = userMBTI.split('');
+        const listContainer = document.getElementById('adviceList');
+        listContainer.innerHTML = ''; // 중복 축적 방지 초기화
+
+        const activeSubMatrix = adviceDatabase[category];
+        const badgeClasses = ['ei', 'sn', 'tf', 'jp'];
+        const labelTitles = ['E/I 성향', 'S/N 성향', 'T/F 성향', 'J/P 성향'];
+
+        // 4개의 지표 자리를 분해하여 맞춤 조언 카드 동적 바인딩
+        for (let i = 0; i < 4; i++) {
+            const char = chars[i];
+            const textContent = activeSubMatrix[char];
+
+            const adviceCard = document.createElement('div');
+            adviceCard.className = 'advice-card';
+            adviceCard.innerHTML = `
+                <span class="indicator-badge badge-${badgeClasses[i]}">${labelTitles[i]} (${char})</span>
+                <p class="advice-text">${textContent}</p>
+            `;
+            listContainer.appendChild(adviceCard);
+        }
+
+        // 헤더 아이콘 및 제목 업데이트
+        document.getElementById('resultEmoji').innerText = emojiMap[category] || "🔮";
+        document.getElementById('resultTitle').innerText = `${userMBTI} 유형 맞춤형 [${category}] 종합 분석 처방전`;
+
+        // 결과 영역 열기
+        const resultBox = document.getElementById('resultBox');
+        resultBox.style.display = 'block';
+
+        // 모바일 최적화를 위해 결과창으로 자동 포커스 이동
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+</script>
+
+</body>
+</html>
